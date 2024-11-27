@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Investimento Simples</title>
+  <title>Inv Multi Simples</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -44,161 +44,194 @@
       width: 47px;
       text-align: center;
     }
-    .button-group {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
+    .details {
       margin-top: 20px;
-    }
-    /* Modal styling */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.4);
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      max-width: 300px;
-      margin: auto;
-    }
-    .close {
-      float: right;
-      font-size: 20px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .close:hover {
-      color: red;
-    }
-    input {
-      width: 100%;
       padding: 10px;
-      margin: 10px 0;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 10px;
+      background: #fff3cd;
+      text-align: left;
+    }
+    .card {
+      margin: 20px auto;
+      padding: 15px;
+      border: 1px solid #000;
+      border-radius: 10px;
+      background: #f9f9f9;
+      text-align: left;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    .card button {
+      background: #007bff;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Investimento</h1>
-    <label for="invest">Valor do Investimento (10 a 100):</label>
+    <h1>Inv Multi</h1>
+    <label for="invest">Valor do Investimento (10 a 100):</label><br>
     <input type="number" id="invest" min="10" max="100">
+    <p id="valorSelecionado">Valor Selecionado: R$0</p> <!-- Exibe o valor selecionado -->
     <div class="value-buttons">
       <!-- Botões serão gerados aqui -->
     </div>
-    <button onclick="iniciarInvestimento()">Iniciar Investimento</button>
-    <p id="resumo">Nenhum investimento iniciado.</p>
-      <p id="resumo1">Nenhum investimento iniciado.</p>
-    <div class="button-group">
-      <button id="sacarDiario" onclick="abrirModalSaque()" disabled>Sacar Valor Diário</button>
-      <button id="sacarTotal" onclick="sacarTotal()" disabled>Sacar Valor Total</button>
-    </div>
-  </div>
+    <button onclick="gerarInvestimento()">Confirmar Investimento</button>
+    <p id="senhaGerada">Senha: Nenhuma</p>
 
-  <!-- Modal PIX -->
-  <div id="modal-invest" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="fecharModalInvestimento()">&times;</span>
-      <h2>Detalhes do PIX</h2>
-      <p>Chave PIX: <strong id="chavePix">12345678900</strong></p>
-      <button onclick="copiarPix()">Copiar PIX</button>
-    </div>
-  </div>
+    <hr>
+    <h3>Digite a senha para ver os detalhes:</h3>
+    <input type="text" id="senhaInput" placeholder="Insira a senha">
+    <button onclick="mostrarDetalhes()">Ver Detalhes</button>
+    <div id="detalhes" class="details" style="display: none;"></div>
 
-  <!-- Modal Saque -->
-  <div id="modal-saque" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="fecharModalSaque()">&times;</span>
-      <h2>Sacar Juros</h2>
-      <label for="nome">Nome:</label>
-      <input type="text" id="nome" placeholder="Digite seu nome">
-      <label for="pix">Chave PIX:</label>
-      <input type="text" id="pix" placeholder="Digite sua chave PIX">
-      <button onclick="confirmarSaque()">Confirmar Saque</button>
-    </div>
+    <div id="cards"></div>
   </div>
 
   <script>
-    
-  const jurosDiarios = 0.01; // 1% ao dia
-  let investimento = 0;
-  let totalDias = 0;
-  let valorJuros = 0;
-
-  const iniciarInvestimento = () => {
-    investimento = parseFloat(document.getElementById('invest').value);
-    if (isNaN(investimento) || investimento < 10 || investimento > 100) {
-      alert('Por favor, insira um valor de investimento válido entre 10 e 100.');
-      return;
-    }
-    totalDias = 0; // Zera o contador de dias ao iniciar um novo investimento
-    valorJuros = 0; // Zera o valor dos juros
-    atualizarResumo();
-    verificarBotoes();
-  };
-
-  const atualizarResumo = () => {
-    // Calcula o juro acumulado com base nos dias
-    valorJuros = investimento * jurosDiarios * totalDias;
-
-    // Valor total (investimento + juros)
-    const totalComJuros = investimento + valorJuros;
-
-    // Atualiza o conteúdo do resumo
-    const resumo = `
-      <strong>Investimento inicial:</strong> R$${investimento.toFixed(2)}<br>
-      <strong>Juros acumulados:</strong> R$${valorJuros.toFixed(2)}<br>
-      <strong>Total (Investimento + Juros):</strong> R$${totalComJuros.toFixed(2)}<br>
-      <strong>Dias passados:</strong> ${totalDias}
-    `;
-    document.getElementById('resumo').innerHTML = resumo;
-  };
-
-  const verificarBotoes = () => {
-    // Habilita ou desabilita botões com base nas condições
-    document.getElementById('sacarDiario').disabled = valorJuros === 0;
-    document.getElementById('sacarTotal').disabled = totalDias < 15;
-  };
-
-  // Gerador de botões de valor para escolha rápida
-  const gerarBotoesDeValor = () => {
+    const senhas = {}; // Armazena senhas e dados do investimento
     const buttonContainer = document.querySelector('.value-buttons');
-    for (let i = 10; i <= 100; i += 10) {
-      const button = document.createElement('button');
-      button.textContent = `R$${i}`;
-      button.onclick = () => {
-        // Ao clicar no botão, define o valor no input
-        document.getElementById('invest').value = i;
 
-        // Desabilita todos os botões e destaca o botão selecionado
-        const buttons = document.querySelectorAll('.value-buttons button');
-        buttons.forEach(b => b.disabled = true);
-        button.style.backgroundColor = 'green';
-        button.style.color = 'white';
+    // Gera o investimento e cria o card
+    const gerarInvestimento = () => {
+      const valor = parseFloat(document.getElementById('invest').value);
+      if (isNaN(valor) || valor < 10 || valor > 100) {
+        alert('Por favor, insira um valor de investimento válido entre 10 e 100.');
+        return;
+      }
+
+      const nome = prompt("Digite seu nome:");
+      if (!nome) {
+        alert("Nome é obrigatório!");
+        return;
+      }
+
+      // Data e hora
+      const now = new Date();
+      const dataHora = now.toLocaleString();
+
+      // Gera senha única
+      const senha = `INV-${Math.floor(10000 + Math.random() * 90000)}`;
+
+      // Calcula os juros
+      const jurosDiarios = valor * 0.02; // 2% ao dia
+      const totalJuros = jurosDiarios * 15;
+      const totalReceber = valor + totalJuros;
+
+      // Salva os dados no objeto e no Local Storage
+      const dados = {
+        nome,
+        valorInvestido: valor,
+        jurosDiarios,
+        totalJuros,
+        totalReceber,
+        senha,
+        dataHora,
+        codigoIndicacao: `IND-${Math.floor(1000 + Math.random() * 9000)}`,
+        linkSite: "https://www.meusite.com",
+        chavePix: "1234-5678-9101-1121"
       };
-      buttonContainer.appendChild(button);
-    }
-  };
+      senhas[senha] = dados;
+      localStorage.setItem('investimentos', JSON.stringify(senhas));
 
-  const salvarDados = () => {
-    const dados = { investimento, totalDias, valorJuros };
-    localStorage.setItem('investimento', JSON.stringify(dados));
-  };
+      // Exibe a senha gerada no display
+      document.getElementById('senhaGerada').textContent = `Senha: ${senha}`;
 
-  gerarBotoesDeValor();
+      // Desativa os botões e o input valor por 7 dias
+      desativarBotoes();
 
+      // Cria o card
+      criarCard(dados);
+      alert(`Investimento confirmado! Sua senha é: ${senha}`);
+    };
+
+    const criarCard = (dados) => {
+      const cardsContainer = document.getElementById('cards');
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <p><strong>Nome:</strong> ${dados.nome}</p>
+        <p><strong>Data/Hora:</strong> ${dados.dataHora}</p>
+        <p><strong>Valor Investido:</strong> R$${dados.valorInvestido.toFixed(2)}</p>
+        <p><strong>Total de Juros:</strong> R$${dados.totalJuros.toFixed(2)}</p>
+        <p><strong>Total a Receber:</strong> R$${dados.totalReceber.toFixed(2)}</p>
+        <p><strong>Chave Pix:</strong> ${dados.chavePix}</p>
+        <button onclick="confirmarPagamento('${dados.senha}')">Pagamento</button>
+        <button onclick="copiarPix('${dados.chavePix}')">Cópia Pix</button>
+      `;
+      cardsContainer.appendChild(card);
+    };
+
+    const confirmarPagamento = (senha) => {
+      alert(`Pagamento confirmado para o investimento com senha: ${senha}`);
+    };
+
+    const copiarPix = (chavePix) => {
+      navigator.clipboard.writeText(chavePix)
+        .then(() => {
+          alert("Chave Pix copiada para a área de transferência!");
+        })
+        .catch(err => {
+          alert("Erro ao copiar chave Pix: " + err);
+        });
+    };
+
+    const desativarBotoes = () => {
+      const buttons = buttonContainer.querySelectorAll('button');
+      buttons.forEach(button => {
+        button.disabled = true;
+      });
+      document.getElementById('invest').disabled = true;
+      localStorage.setItem('botoesDesativados', Date.now());
+    };
+
+    const verificarBotoes = () => {
+      const dataDesativacao = localStorage.getItem('botoesDesativados');
+      if (dataDesativacao) {
+        const diasPassados = (Date.now() - dataDesativacao) / (1000 * 60 * 60 * 24);
+        if (diasPassados < 7) {
+          desativarBotoes();
+        }
+      }
+    };
+
+    const gerarBotoesDeValor = () => {
+      for (let i = 10; i <= 100; i += 10) {
+        const button = document.createElement('button');
+        button.textContent = `R$${i}`;
+        button.onclick = () => {
+          document.getElementById('invest').value = i;
+          // Atualiza o valor selecionado no display
+          document.getElementById('valorSelecionado').textContent = `Valor Selecionado: R$${i}`;
+        };
+        buttonContainer.appendChild(button);
+      }
+    };
+
+    const mostrarDetalhes = () => {
+      const senha = document.getElementById('senhaInput').value;
+      if (!senhas[senha]) {
+        alert('Senha inválida ou não encontrada.');
+        return;
+      }
+
+      const dados = senhas[senha];
+      const detalhesHTML = `
+        <p><strong>Nome:</strong> ${dados.nome}</p>
+        <p><strong>Valor Investido:</strong> R$${dados.valorInvestido.toFixed(2)}</p>
+        <p><strong>Data/Hora:</strong> ${dados.dataHora}</p>
+        <p><strong>Juros Diários (2%):</strong> R$${dados.jurosDiarios.toFixed(2)}</p>
+        <p><strong>Total de Juros (15 dias):</strong> R$${dados.totalJuros.toFixed(2)}</p>
+        <p><strong>Total a Receber:</strong> R$${dados.totalReceber.toFixed(2)}</p>
+        <p><strong>Código de Indicação:</strong> ${dados.codigoIndicacao}</p>
+        <p><strong>Link do Site:</strong> <a href="${dados.linkSite}" target="_blank">${dados.linkSite}</a></p>
+      `;
+      document.getElementById('detalhes').innerHTML = detalhesHTML;
+      document.getElementById('detalhes').style.display = 'block';
+    };
+
+    // Inicializa os botões e verifica desativação
+    gerarBotoesDeValor();
+    verificarBotoes();
   </script>
 </body>
 </html>
