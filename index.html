@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inv Multi Simples</title>
+  <title>Investimento Simples</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -68,7 +68,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Inv Multi</h1>
+    <h1>Investimento</h1>
     <label for="invest">Valor do Investimento (10 a 100):</label><br>
     <input type="number" id="invest" min="10" max="100">
     <p id="valorSelecionado">Valor Selecionado: R$0</p> <!-- Exibe o valor selecionado -->
@@ -88,10 +88,9 @@
   </div>
 
   <script>
-    const senhas = {}; // Armazena senhas e dados do investimento
     const buttonContainer = document.querySelector('.value-buttons');
 
-    // Gera o investimento e cria o card
+    // Função para gerar o investimento e criar o card
     const gerarInvestimento = () => {
       const valor = parseFloat(document.getElementById('invest').value);
       if (isNaN(valor) || valor < 10 || valor > 100) {
@@ -130,6 +129,9 @@
         linkSite: "https://www.meusite.com",
         chavePix: "1234-5678-9101-1121"
       };
+
+      // Armazena os dados no localStorage, garantindo que os dados sejam salvos para cada senha
+      let senhas = JSON.parse(localStorage.getItem('investimentos')) || {};
       senhas[senha] = dados;
       localStorage.setItem('investimentos', JSON.stringify(senhas));
 
@@ -144,6 +146,7 @@
       alert(`Investimento confirmado! Sua senha é: ${senha}`);
     };
 
+    // Função para criar o card com os dados do investimento
     const criarCard = (dados) => {
       const cardsContainer = document.getElementById('cards');
       const card = document.createElement('div');
@@ -161,10 +164,12 @@
       cardsContainer.appendChild(card);
     };
 
+    // Função para simular pagamento
     const confirmarPagamento = (senha) => {
       alert(`Pagamento confirmado para o investimento com senha: ${senha}`);
     };
 
+    // Função para copiar a chave Pix para a área de transferência
     const copiarPix = (chavePix) => {
       navigator.clipboard.writeText(chavePix)
         .then(() => {
@@ -175,6 +180,7 @@
         });
     };
 
+    // Função para desativar os botões e o input valor por 7 dias
     const desativarBotoes = () => {
       const buttons = buttonContainer.querySelectorAll('button');
       buttons.forEach(button => {
@@ -184,6 +190,7 @@
       localStorage.setItem('botoesDesativados', Date.now());
     };
 
+    // Função para verificar se os botões devem ser desativados
     const verificarBotoes = () => {
       const dataDesativacao = localStorage.getItem('botoesDesativados');
       if (dataDesativacao) {
@@ -194,6 +201,7 @@
       }
     };
 
+    // Função para gerar os botões de valor
     const gerarBotoesDeValor = () => {
       for (let i = 10; i <= 100; i += 10) {
         const button = document.createElement('button');
@@ -207,8 +215,11 @@
       }
     };
 
+    // Função para mostrar os detalhes com base na senha
     const mostrarDetalhes = () => {
       const senha = document.getElementById('senhaInput').value;
+      let senhas = JSON.parse(localStorage.getItem('investimentos')) || {};
+
       if (!senhas[senha]) {
         alert('Senha inválida ou não encontrada.');
         return;
@@ -224,6 +235,7 @@
         <p><strong>Total a Receber:</strong> R$${dados.totalReceber.toFixed(2)}</p>
         <p><strong>Código de Indicação:</strong> ${dados.codigoIndicacao}</p>
         <p><strong>Link do Site:</strong> <a href="${dados.linkSite}" target="_blank">${dados.linkSite}</a></p>
+        <p><strong>Chave Pix:</strong> ${dados.chavePix}</p>
       `;
       document.getElementById('detalhes').innerHTML = detalhesHTML;
       document.getElementById('detalhes').style.display = 'block';
