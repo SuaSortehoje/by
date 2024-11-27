@@ -12,8 +12,9 @@
       text-align: center;
     }
     .container {
-      max-width: 800px;
-      margin: 5px auto;
+      max-width: 800px auto;
+      margin: 5px ;
+      height: 400px;
       background: #ffe715;
       margin-top: 80px;
       padding: 20px;
@@ -22,7 +23,7 @@
       box-shadow: 2px 2px 10px #aaa;
     }
     button {
-      margin: 2px;
+      margin: 5px;
       padding: 10px;
       border: none;
       border-radius: 5px;
@@ -41,7 +42,7 @@
       gap: 10px;
     }
     .value-buttons button {
-      width: 47px;
+      width: 70px;
       text-align: center;
     }
     .details {
@@ -64,23 +65,38 @@
     .card button {
       background: #007bff;
     }
+    .inputClass {
+      text-align: center;
+      width: 40%;
+      border-radius: 5px;
+    }
+    .inputSenha {
+      display: inline-block;
+      height: 30px;
+      text-align: center;
+      width: 50%;
+      border-radius: 10px;
+    }
+    h3{
+        font-size:18px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Investimento</h1>
-    <label for="invest">Valor do Investimento (10 a 100):</label><br>
-    <input type="number" id="invest" min="10" max="100">
+    
+    <input class="inputClass" type="number" id="invest" readonly>
     <p id="valorSelecionado">Valor Selecionado: R$0</p> <!-- Exibe o valor selecionado -->
     <div class="value-buttons">
       <!-- Botões serão gerados aqui -->
     </div>
     <button onclick="gerarInvestimento()">Confirmar Investimento</button>
-    <p id="senhaGerada">Senha: Nenhuma</p>
+    <p id="senhaGerada">Senha: N/A</p>
 
     <hr>
     <h3>Digite a senha para ver os detalhes:</h3>
-    <input type="text" id="senhaInput" placeholder="Insira a senha">
+    <input class="inputSenha" type="text" id="senhaInput" placeholder="Insira a senha">
     <button onclick="mostrarDetalhes()">Ver Detalhes</button>
     <div id="detalhes" class="details" style="display: none;"></div>
 
@@ -89,12 +105,43 @@
 
   <script>
     const buttonContainer = document.querySelector('.value-buttons');
+    let valorTotal = 0; // Valor acumulado
 
-    // Função para gerar o investimento e criar o card
+    // Função para criar os botões de valor
+    const gerarBotoesDeValor = () => {
+      for (let i = 10; i <= 100; i += 10) {
+        const button = document.createElement('button');
+        button.textContent = `R$${i}`;
+        button.onclick = () => {
+          valorTotal += i; // Acumula o valor
+          document.getElementById('invest').value = valorTotal;
+          document.getElementById('valorSelecionado').textContent = `Valor Selecionado: R$${valorTotal}`;
+          salvarValorNoLocalStorage(valorTotal);
+        };
+        buttonContainer.appendChild(button);
+      }
+    };
+
+    // Função para salvar o valor no localStorage
+    const salvarValorNoLocalStorage = (valor) => {
+      localStorage.setItem('valorAtual', valor);
+    };
+
+    // Função para recuperar o valor do localStorage
+    const recuperarValorDoLocalStorage = () => {
+      const valor = localStorage.getItem('valorAtual');
+      if (valor) {
+        valorTotal = parseFloat(valor);
+        document.getElementById('invest').value = valorTotal;
+        document.getElementById('valorSelecionado').textContent = `Valor Selecionado: R$${valorTotal}`;
+      }
+    };
+
+    // Função para gerar o investimento
     const gerarInvestimento = () => {
-      const valor = parseFloat(document.getElementById('invest').value);
-      if (isNaN(valor) || valor < 10 || valor > 100) {
-        alert('Por favor, insira um valor de investimento válido entre 10 e 100.');
+      const valor = valorTotal;
+      if (valor < 10 || valor > 1000) {
+        alert('Por favor, insira um valor de investimento válido entre 10 e 1000.');
         return;
       }
 
@@ -112,11 +159,11 @@
       const senha = `INV-${Math.floor(10000 + Math.random() * 90000)}`;
 
       // Calcula os juros
-      const jurosDiarios = valor * 0.02; // 2% ao dia
+      const jurosDiarios = valor * 0.01; // 1% ao dia
       const totalJuros = jurosDiarios * 15;
       const totalReceber = valor + totalJuros;
 
-      // Salva os dados no objeto e no Local Storage
+      // Salva os dados no localStorage
       const dados = {
         nome,
         valorInvestido: valor,
@@ -125,62 +172,21 @@
         totalReceber,
         senha,
         dataHora,
-        codigoIndicacao: `IND-${Math.floor(1000 + Math.random() * 9000)}`,
-        linkSite: "https://www.meusite.com",
-        chavePix: "1234-5678-9101-1121"
       };
 
-      // Armazena os dados no localStorage, garantindo que os dados sejam salvos para cada senha
       let senhas = JSON.parse(localStorage.getItem('investimentos')) || {};
       senhas[senha] = dados;
       localStorage.setItem('investimentos', JSON.stringify(senhas));
 
-      // Exibe a senha gerada no display
       document.getElementById('senhaGerada').textContent = `Senha: ${senha}`;
 
-      // Desativa os botões e o input valor por 7 dias
       desativarBotoes();
-
-      // Cria o card
       criarCard(dados);
+
       alert(`Investimento confirmado! Sua senha é: ${senha}`);
     };
 
-    // Função para criar o card com os dados do investimento
-    const criarCard = (dados) => {
-      const cardsContainer = document.getElementById('cards');
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <p><strong>Nome:</strong> ${dados.nome}</p>
-        <p><strong>Data/Hora:</strong> ${dados.dataHora}</p>
-        <p><strong>Valor Investido:</strong> R$${dados.valorInvestido.toFixed(2)}</p>
-        <p><strong>Total de Juros:</strong> R$${dados.totalJuros.toFixed(2)}</p>
-        <p><strong>Total a Receber:</strong> R$${dados.totalReceber.toFixed(2)}</p>
-        <p><strong>Chave Pix:</strong> ${dados.chavePix}</p>
-        <button onclick="confirmarPagamento('${dados.senha}')">Pagamento</button>
-        <button onclick="copiarPix('${dados.chavePix}')">Cópia Pix</button>
-      `;
-      cardsContainer.appendChild(card);
-    };
-
-    // Função para simular pagamento
-    const confirmarPagamento = (senha) => {
-      alert(`Pagamento confirmado para o investimento com senha: ${senha}`);
-    };
-
-    // Função para copiar a chave Pix para a área de transferência
-    const copiarPix = (chavePix) => {
-      navigator.clipboard.writeText(chavePix)
-        .then(() => {
-          alert("Chave Pix copiada para a área de transferência!");
-        })
-        .catch(err => {
-          alert("Erro ao copiar chave Pix: " + err);
-        });
-    };
-
-    // Função para desativar os botões e o input valor por 7 dias
+    // Função para desativar botões
     const desativarBotoes = () => {
       const buttons = buttonContainer.querySelectorAll('button');
       buttons.forEach(button => {
@@ -201,21 +207,23 @@
       }
     };
 
-    // Função para gerar os botões de valor
-    const gerarBotoesDeValor = () => {
-      for (let i = 10; i <= 100; i += 10) {
-        const button = document.createElement('button');
-        button.textContent = `R$${i}`;
-        button.onclick = () => {
-          document.getElementById('invest').value = i;
-          // Atualiza o valor selecionado no display
-          document.getElementById('valorSelecionado').textContent = `Valor Selecionado: R$${i}`;
-        };
-        buttonContainer.appendChild(button);
-      }
+    // Função para criar o card com os dados
+    const criarCard = (dados) => {
+      const cardsContainer = document.getElementById('cards');
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <p><strong>Nome:</strong> ${dados.nome}</p>
+        <p><strong>Data/Hora:</strong> ${dados.dataHora}</p>
+        <p><strong>Valor Investido:</strong> R$${dados.valorInvestido.toFixed(2)}</p>
+        <p><strong>Total de Juros:</strong> R$${dados.totalJuros.toFixed(2)}</p>
+        <p><strong>Total a Receber:</strong> R$${dados.totalReceber.toFixed(2)}</p>
+        <button onclick="enviarParaWhatsApp('${dados.nome}', '${dados.valorInvestido}', '${dados.totalJuros}', '${dados.totalReceber}')">Enviar para WhatsApp</button>
+      `;
+      cardsContainer.appendChild(card);
     };
 
-    // Função para mostrar os detalhes com base na senha
+    // Função para mostrar detalhes
     const mostrarDetalhes = () => {
       const senha = document.getElementById('senhaInput').value;
       let senhas = JSON.parse(localStorage.getItem('investimentos')) || {};
@@ -230,29 +238,38 @@
         <p><strong>Nome:</strong> ${dados.nome}</p>
         <p><strong>Valor Investido:</strong> R$${dados.valorInvestido.toFixed(2)}</p>
         <p><strong>Data/Hora:</strong> ${dados.dataHora}</p>
-        <p><strong>Juros Diários (2%):</strong> R$${dados.jurosDiarios.toFixed(2)}</p>
         <p><strong>Total de Juros (15 dias):</strong> R$${dados.totalJuros.toFixed(2)}</p>
         <p><strong>Total a Receber:</strong> R$${dados.totalReceber.toFixed(2)}</p>
-        <p><strong>Código de Indicação:</strong> ${dados.codigoIndicacao}</p>
-        <p><strong>Link do Site:</strong> <a href="${dados.linkSite}" target="_blank">${dados.linkSite}</a></p>
-        <p><strong>Chave Pix:</strong> ${dados.chavePix}</p>
       `;
       document.getElementById('detalhes').innerHTML = detalhesHTML;
       document.getElementById('detalhes').style.display = 'block';
     };
-    
-// Função para resetar o localStorage
-/*const resetarLocalStorage = () => {
+
+    // Função para enviar dados para WhatsApp
+    const enviarParaWhatsApp = (nome, valorInvestido, totalJuros, totalReceber) => {
+      const mensagem = `Olá! Aqui estão os dados do investimento:\n\n` +
+        `Nome: ${nome}\n` +
+        `Valor Investido: R$${parseFloat(valorInvestido).toFixed(2)}\n` +
+        `Juros Acumulados: R$${parseFloat(totalJuros).toFixed(2)}\n` +
+        `Total a Receber: R$${parseFloat(totalReceber).toFixed(2)}\n`;
+
+      const url = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+      window.open(url, '_blank');
+    };
+const resetarLocalStorage = () => {
   localStorage.clear();
-  alert('LocalStorage foi resetado!');
+  alert("LocalStorage foi zerado!");
+  
 };
 
-    // Inicializa os botões e verifica desativação
-    localStorage.clear();
-    resetarLocalStorage();*/
-    gerarBotoesDeValor();
-    verificarBotoes();
-    
+    // Inicialização
+    window.onload = () => {
+      gerarBotoesDeValor();
+      verificarBotoes();
+      recuperarValorDoLocalStorage();
+      
+    };
+   
   </script>
 </body>
 </html>
