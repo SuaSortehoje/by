@@ -1,9 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Investimento Simples</title>
+    <link rel="shortcut icon" type="image/png" href="https://raw.githubusercontent.com/SuaSortehoje/by/refs/heads/main/inv1.jpg">
+    <link rel="icon" href="https://raw.githubusercontent.com/SuaSortehoje/by/refs/heads/main/inv1.jpg" type="image/jpg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" media="screen" /> 
+    <title>💲Investimento💰Inv💲</title>
   <style>
    body {
       font-family: Arial, sans-serif;
@@ -16,7 +18,8 @@
       margin: 2px ;
       height: 400px auto;
       background: #ffe715;
-      margin-top: 80px;
+      margin-top: 2px;
+      margin-down:2px;
       padding: 20px;
       border: 1px solid #ccc;
       border-radius: 10px;
@@ -29,7 +32,9 @@
       border: none;
       border-radius: 5px;
       background: #28a745;
-      color: white;
+      color: black;
+      font-weight:bold;
+      
       cursor: pointer;
     }
     button:disabled {
@@ -39,7 +44,7 @@
     .value-buttons {
       display: flex;
       flex-wrap: wrap;
-      margin:0 0 5px;
+      margin:0 0 2px;
       gap: 5px;
     }
     .value-buttons button {
@@ -66,16 +71,17 @@
     .card button {
       background: #007bff;
     }
-    .inputClass {
+    input {
       text-align: center;
-      width: 40%;
-      margin:10px;
+      width: 45%;
+      padding:4px;
+      margin:4px;
       border-radius: 5px;
     }
     .inputSenha {
       display: inline-block;
       height: 30px;
-      
+      margin:2px;
       text-align: center;
       width: 50%;
       border-radius: 10px;
@@ -98,7 +104,8 @@
 
     .modal-content {
       background-color: #fefefe;
-      margin: 5% auto;
+      margin: 5%;
+      margin-top: 5%;
       padding: 20px;
       border: 1px solid #888;
       width: 80%;
@@ -149,11 +156,27 @@
       color: #ffffff;
       text-decoration: underline;
     }
+    .btnDeposito{
+          animation 3seg
+    }
+    @keyframe{
+          ba
+    }
+    .imagemCentral{
+    margin-top:40px;
+          width:99%;
+          height:140px;
+          border:1px solid red;
+    }
   </style>
 </head>
 <body>
+      
+      <img class="imagemCentral" src="https://raw.githubusercontent.com/SuaSortehoje/by/refs/heads/main/inv2.jpg">
+     
+     
   <div class="container">
-    <h1>PEROLA INV</h1>
+    
     <input type="number" id="invest" readonly placeholder="Total: R$0">
     <button id="limparValorButton" onclick="limparValor()" class="limpa">Limpar Valor</button>
 
@@ -170,7 +193,7 @@
   <div id="pixModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="fecharModal()">&times;</span>
-      <h2>Cadastro de Nome e Chave Pix</h2>
+      <h2>Cadastro</h2>
       <label for="nomeInput">Nome:</label>
       <input type="text" id="nomeInput" placeholder="Seu nome">
       <br><br>
@@ -238,14 +261,15 @@
         return;
       }
 
-      const senha = `INV-${Math.floor(10000 + Math.random() * 90000)}`;
-      const jurosDiarios = valorTotal * 0.01;
+      const senha = `${nome}${Math.floor(10000 + Math.random() * 90000)}`;
+      const jurosDiarios = valorTotal * 0.005;
+
       const juros15Dias = jurosDiarios * 15;
       const dataAtual = new Date();
       const dataRetirada = new Date();
       dataRetirada.setDate(dataAtual.getDate() + 15);
 
-      const link = `https://meusite.com/${nome.replace(/\s/g, '').toLowerCase()}`;
+      const link = `https://investpay.netlify.app/${nome.replace(/\s/g, '').toLowerCase()}`;
 
       const cadastro = {
         nome,
@@ -307,7 +331,11 @@
             <p><strong>Data do Investimento:</strong> ${cadastro.dataInvestimento}</p>
             <p><strong>Data de Retirada:</strong> ${cadastro.dataRetirada}</p>
             <p><strong>Link de Indicação:</strong> <a href="${cadastro.link}" target="_blank">${cadastro.link}</a></p>
-            <button onclick="enviarWhatsApp('${cadastro.nome}', '${cadastro.valorInvestido}', '${cadastro.juros15Dias}', '${cadastro.dataRetirada}', '${cadastro.link}', '${cadastro.senha}')">Enviar via WhatsApp</button><button onclick="alert('Falta Alguns Dias Para Fazer Sua Retirada Aguarde\nEntre em Contato Com Seu Master Para Retira o Juro Parcial')">RETIRADA</button>
+            <button onclick="enviarWhatsApp('${cadastro.nome}', '${cadastro.valorInvestido}', '${cadastro.juros15Dias}', '${cadastro.dataRetirada}', '${cadastro.link}', '${cadastro.senha}')">VALIDAR INV</button>
+<a href="https://multijogo.github.io/Link-de-pagamento-pix/">
+            <button class="btnDeposito">DEPOSITO</button></a>
+            
+            <button onclick="retirada()">RETIRADA</button>
           </div>`;
       } else {
         alert('Cadastro não encontrado.');
@@ -315,12 +343,12 @@
     };
 
     const enviarWhatsApp = (nome, valorInvestido, juros15Dias, dataRetirada, link, senha) => {
-      const mensagem = `Olá, aqui estão os dados do seu investimento:\n\n` +
+      const mensagem = `${nome} Olá, aqui estão os dados do seu investimento:\n\n` +
         `- Nome: ${nome}\n` +
         `- Valor Investido: R$${valorInvestido}\n` +
         `- Juros em 15 dias: R$${juros15Dias}\n` +
         `- Data de Retirada: ${dataRetirada}\n` +
-        `- Link: ${link}\n` +
+        `- Link indicação : ${link}\n` +
         `- Senha: ${senha}`;
 
       const numeroWhatsApp = '71992290058';
@@ -340,6 +368,10 @@
       document.getElementById('invest').value = 'Total: R$0';
       salvarValorTotal();
     };
+    function retirada(){
+          alert('Falta Alguns Dias Para Fazer Sua Retirada Aguarde\nEntre em Contato Com Seu indicaco Para Retira o Juro Parcial')
+    };
+    
   </script>
 </body>
 </html>
