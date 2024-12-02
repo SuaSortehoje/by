@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//pt-BR">
 <head>
-    <link rel="shortcut icon" type="image/png" href="https://raw.githubusercontent.com/SuaSortehoje/by/refs/heads/main/inv2.jpg">
-    <link rel="icon" href="https://raw.githubusercontent.com/SuaSortehoje/by/refs/heads/main/inv2.jpg" type="image/jpg">
+    <link rel="shortcut icon" type="image/png" href="https://raw.githubusercontent.com/SuaSortehoje/by/refs/heads/main/inv1.jpg">
+    <link rel="icon" href="https://raw.githubusercontent.com/SuaSortehoje/by/refs/heads/main/inv1.jpg" type="image/jpg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" type="text/css" href="stylesheet.css" media="screen" /> 
@@ -171,7 +171,9 @@
   </style>
 </head>
 <body>
-      
+      <!-- Adicionar o campo para mostrar os juros diários -->
+<input type="text" id="jurosDiarios" readonly placeholder="Juros Diários: R$0">
+
       <img class="imagemCentral" src="https://raw.githubusercontent.com/SuaSortehoje/by/refs/heads/main/inv2.jpg">
      
      
@@ -200,7 +202,7 @@
       <label for="pixInput">Chave Pix:</label>
       <input type="text" id="pixInput" placeholder="Chave Pix">
       <br><br>
-      <button onclick="confirmarInvestimento()">Salvar e Confirmar</button>
+      <a href="https://multijogo.github.io/Link-de-pagamento-pix/"><button onclick="confirmarInvestimento()">Salvar e Confirmar</button></a>
     </div>
   </div>
 
@@ -333,7 +335,7 @@
             <p><strong>Link de Indicação:</strong> <a href="${cadastro.link}" target="_blank">${cadastro.link}</a></p>
             <button onclick="enviarWhatsApp('${cadastro.nome}', '${cadastro.valorInvestido}', '${cadastro.juros15Dias}', '${cadastro.dataRetirada}', '${cadastro.link}', '${cadastro.senha}')">VALIDAR INV</button>
 <a href="https://multijogo.github.io/Link-de-pagamento-pix/">
-            <button class="btnDeposito">DEPOSITO</button></a>
+            <button class="btnDeposito">INVESTIR</button></a>
             
             <button onclick="retirada()">RETIRADA</button>
           </div>`;
@@ -355,13 +357,27 @@
       const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
       window.open(url, '_blank');
     };
+const calcularJurosDiarios = () => {
+  const dataInvestimento = localStorage.getItem('dataInvestimento');
+  if (dataInvestimento) {
+    const dataAtual = new Date();
+    const dataInvestido = new Date(dataInvestimento);
+    const diffTime = dataAtual - dataInvestido;
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
-    window.onload = () => {
-      carregarValorTotal();
-      gerarBotoesDeValor();
-      esconderBotoesPor15Dias();
-      carregarSenhaGerada();
-    };
+    const jurosDiariosAcumulados = valorTotal * 0.005 * diffDays; // Juros acumulados
+    document.getElementById('jurosDiarios').value = `R$${jurosDiariosAcumulados.toFixed(2)}`;
+  }
+};
+
+window.onload = () => {
+  carregarValorTotal();
+  gerarBotoesDeValor();
+  esconderBotoesPor15Dias();
+  carregarSenhaGerada();
+  calcularJurosDiarios(); // Chama a função ao carregar a página
+};
+
 
     const limparValor = () => {
       valorTotal = 0;
@@ -371,6 +387,7 @@
     function retirada(){
           alert('Falta Alguns Dias Para Fazer Sua Retirada Aguarde\nEntre em Contato Com Seu indicaco Para Retira o Juro Parcial')
     };
+    
   </script>
 </body>
 </html>
