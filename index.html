@@ -163,15 +163,21 @@
           ba
     }
     .imagemCentral{
-    margin-top:40px;
+    margin-top:5px;
           width:99%;
           height:140px;
           border:1px solid red;
+    }
+    .juro{
+          font-weight:bold;
+          display:flex;
+          justify-content:center;
     }
   </style>
 </head>
 <body>
       <!-- Adicionar o campo para mostrar os juros diários -->
+     <label class="juro">JUROS DIARIOS</label> 
 <input type="text" id="jurosDiarios" readonly placeholder="Juros Diários: R$0">
 
       <img class="imagemCentral" src="https://raw.githubusercontent.com/SuaSortehoje/by/refs/heads/main/inv2.jpg">
@@ -385,7 +391,7 @@ window.onload = () => {
       salvarValorTotal();
     };
     function retirada(){
-          alert('Falta Alguns Dias Para Fazer Sua Retirada Aguarde\nEntre em Contato Com Seu indicaco Para Retira o Juro Parcial')
+          alert('Falta Alguns Dias Para Fazer Sua Retirada Aguarde...\nEntre em Contato Com Sia Indicacao Para Retira o Juro Parcial ou valor total')
     };
     
   </script>
