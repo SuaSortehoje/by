@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💲VIVER DE JURO💰Inv💲</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 5px;
+            background: #40ffa1;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2px auto;
+            height: 400px auto;
+            background: #ffe715;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px #aaa;
+        }
+        button {
+            margin: 2px;
+            padding: 7px;
+            border: none;
+            border-radius: 5px;
+            background: #28a745;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .value-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 0 2px;
+            gap: 4px;
+        }
+        .value-buttons button {
+            width: 50px;
+            text-align: center;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 10px;
+        }
+        .close {
+            color: red;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        input {
+            text-align: center;
+            width: 45%;
+            padding: 4px;
+            margin: 4px;
+            border-radius: 5px;
+        }
+        .limpa {
+            background: #ff2b4a;
+            padding: 5px;
+            margin-top: 50px;
+        }
+        .card {
+            background-color: tomato;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            margin: 15px 0;
+            display: none; /* Escondido inicialmente */
+        }
+        #valueButtonsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        #valueButtonsContainer.hidden {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+    <label><strong>Juros Diários:</strong></label>
+    
+    <div id="pixModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModal()">&times;</span>
+            <h2>Cadastro</h2>
+            <label for="nomeInput">Nome:</label>
+            <input type="text" id="nomeInput" placeholder="Seu nome">
+            <br><br>
+            <label for="pixInput">Chave Pix:</label>
+            <input type="text" id="pixInput" placeholder="Chave Pix">
+            <br><br>
+            <button onclick="confirmarInvestimento()">Salvar e Confirmar</button>
+        </div>
+    </div>
+
+    <input type="text" id="jurosDiarios" readonly placeholder="Juros Diários: R$0">
+
+    <div class="container">
+        <h1>Viver de Juro</h1>
+        <input type="text" id="invest" readonly placeholder="Total Investido: R$0">
+        <button id="limparValorButton" onclick="limparValor()">Limpar Valor</button>
+
+        <div id="valueButtonsContainer"></div>
+
+        <button id="confirmarInvestimentoButton" onclick="abrirModal()">Confirmar Investimento</button>
+        
+        <p><strong>Senha Gerada:</strong> <span id="senhaGerada">N/A</span></p>
+
+        <h2>Recuperar Investimento</h2>
+        <input type="text" id="senhaBusca" placeholder="Digite a senha">
+        <button onclick="recuperarCadastro()">Buscar Cadastro</button>
+        <div id="cadastroRecuperado"></div>
+
+        <!-- Card que será exibido após a validação da senha -->
+        <div id="card" class="card">
+            <h3>Cadastro Encontrado!</h3>
+            <p><strong>Nome:</strong> <span id="nomeRecuperado"></span></p>
+            <p><strong>Chave Pix:</strong> <span id="pixRecuperado"></span></p>
+        </div>
+    </div>
+
+    <script>
+        let valorTotal = 0;
+        let jurosDiarios = 0;
+        let ultimaSenha = '';
+
+        const atualizarInputInvest = () => {
+            document.getElementById('invest').value = `R$${valorTotal.toFixed(2).replace('.', ',')}`;
+        };
+
+        const carregarValorTotal = () => {
+            const valorArmazenado = localStorage.getItem('valorTotal');
+            if (valorArmazenado) {
+                valorTotal = parseFloat(valorArmazenado);
+                atualizarInputInvest();
+            }
+        };
+
+        const salvarValorTotal = () => {
+            localStorage.setItem('valorTotal', valorTotal);
+        };
+
+        const gerarBotoesDeValor = () => {
+            const buttonContainer = document.getElementById('valueButtonsContainer');
+            for (let i = 10; i <= 100; i += 10) {
+                const button = document.createElement('button');
+                button.textContent = `R$${i}`;
+                button.onclick = () => {
+                    valorTotal += i;
+                    atualizarInputInvest();
+                    salvarValorTotal();
+                };
+                buttonContainer.appendChild(button);
+            }
+        };
+
+        const atualizarJurosDiarios = () => {
+            jurosDiarios = valorTotal * 0.005; // 0.5% ao dia
+            document.getElementById('jurosDiarios').value = `R$${jurosDiarios.toFixed(2).replace('.', ',')}`;
+            localStorage.setItem('jurosDiarios', jurosDiarios);
+        };
+
+        const salvarDataOcultarBotoes = () => {
+            const dataAtual = new Date();
+            localStorage.setItem('dataOcultarBotoes', dataAtual.getTime());
+        };
+
+        const verificarBotoesOcultos = () => {
+            const dataSalva = localStorage.getItem('dataOcultarBotoes');
+            if (dataSalva) {
+                const dataAtual = new Date();
+                const diferencaDias = (dataAtual.getTime() - parseInt(dataSalva)) / (1000 * 60 * 60 * 24);
+                if (diferencaDias < 7) {
+                    document.getElementById('valueButtonsContainer').style.display = 'none';
+                } else {
+                    localStorage.removeItem('dataOcultarBotoes');
+                    document.getElementById('valueButtonsContainer').style.display = 'flex';
+                }
+            }
+        };
+
+        const confirmarInvestimento = () => {
+            const nome = document.getElementById('nomeInput').value.trim();
+            const chavePix = document.getElementById('pixInput').value.trim();
+
+            if (!nome || !chavePix) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+
+            ultimaSenha = `${nome}${Math.floor(10000 + Math.random() * 90000)}`;
+            localStorage.setItem('ultimaSenha', ultimaSenha);
+
+            document.getElementById('senhaGerada').textContent = ultimaSenha; // Exibe a senha gerada
+
+            salvarValorTotal();
+            salvarDataOcultarBotoes();
+            verificarBotoesOcultos();
+            fecharModal();
+        };
+
+        const abrirModal = () => {
+            document.getElementById('pixModal').style.display = 'block';
+        };
+
+        const fecharModal = () => {
+            document.getElementById('pixModal').style.display = 'none';
+        };
+
+        const recuperarCadastro = () => {
+            const senhaBusca = document.getElementById('senhaBusca').value.trim();
+            const card = document.getElementById('card');
+
+            if (senhaBusca === ultimaSenha) {
+                const nomeRecuperado = document.getElementById('nomeInput').value;
+                const pixRecuperado = document.getElementById('pixInput').value;
+
+                document.getElementById('nomeRecuperado').textContent = nomeRecuperado;
+                document.getElementById('pixRecuperado').textContent = pixRecuperado;
+
+                card.style.display = 'block';  // Exibe o card
+            } else {
+                alert('Senha incorreta!');
+            }
+        };
+
+        window.onload = () => {
+            carregarValorTotal();
+            gerarBotoesDeValor();
+            atualizarJurosDiarios();
+            verificarBotoesOcultos();
+        };
+
+        const limparValor = () => {
+            valorTotal = 0;
+            atualizarInputInvest();
+            salvarValorTotal();
+        };
+        localStorage.clear
+    </script>
+</body>
+</html>
