@@ -127,3 +127,126 @@
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="shortcut icon" type="image/png" href="https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/palpite.jpg">
+  <link rel="icon" href="https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/palpite.jpg" type="image/jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <title>Palpite Diário</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: black;
+      margin: 0;
+    }
+    div {
+      font-size: 24px;
+      font-weight: bold;
+      position: absolute;
+      color: white;
+      margin-bottom: 150px;
+    }
+    img {
+      max-width: 100%;
+      max-height: 80%;
+      border: 1px solid red;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="timeLabel"></div>
+  <img id="dynamicImage" alt="Imagem dinâmica">
+  <script>
+    const images = [
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image01.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image02.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image03.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image04.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image05.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image06.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image07.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image08.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image09.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image10.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image11.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image12.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image13.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image14.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image15.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image16.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image17.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image18.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image19.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image20.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image21.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image22.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image23.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image24.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image25.jpg",
+    ];
+
+    const imageElement = document.getElementById("dynamicImage");
+    const timeLabel = document.getElementById("timeLabel");
+
+    let previousHour = null; // Armazena o horário anterior
+    let selectedImage = ""; // Armazena a imagem selecionada para o horário atual
+
+    function getRandomImage() {
+      const randomIndex = Math.floor(Math.random() * images.length);
+      return images[randomIndex];
+    }
+
+    function updateImage() {
+      const now = new Date();
+      const hour = now.getHours();
+
+      // Apenas atualiza se o horário mudou
+      if (hour === previousHour) {
+        return;
+      }
+
+      previousHour = hour; // Atualiza o horário anterior
+      let displayTime = ""; // Horário correspondente para exibir
+
+      // Lógica de exibição de horários e sorteio de imagem
+      if (hour >= 8 && hour < 10) {
+        displayTime = "10:00";
+      } else if (hour >= 10 && hour < 12) {
+        displayTime = "12:00";
+      } else if (hour >= 12 && hour < 15) {
+        displayTime = "15:00";
+      } else if (hour >= 15 && hour < 19) {
+        displayTime = "19:00";
+      } else if (hour >= 19 && hour < 21) {
+        displayTime = "21:00";
+      } else {
+        displayTime = "Horário aleatório";
+      }
+
+      // Sorteia uma nova imagem para o horário
+      selectedImage = getRandomImage();
+
+      // Atualiza o texto e a imagem
+      timeLabel.textContent = `Horário: ${displayTime}`;
+      imageElement.src = selectedImage;
+      imageElement.style.display = "block";
+
+      console.log("Imagem sorteada:", selectedImage);
+    }
+
+    // Atualiza a imagem ao carregar a página
+    updateImage();
+
+    // Verifica e atualiza a cada minuto
+    setInterval(updateImage, 60000);
+  </script>
+</body>
+</html>
+
