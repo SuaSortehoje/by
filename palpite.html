@@ -36,7 +36,7 @@
       background: skyblue;
     }
     .btn:focus {
-      background: red;
+      background:lime;
     }
   </style>
 </head>
@@ -46,7 +46,7 @@
   <button class="btn" onclick="enviarWhatsApp()" id="whatsapp">JOGAR</button>
   <script>
     const images = [
- "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image01.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image01.jpg",
       "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image02.jpg",
       "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image03.jpg",
       "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image04.jpg",
@@ -71,56 +71,88 @@
       "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image23.jpg",
       "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image24.jpg",
       "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image25.jpg",
+      // Adicione mais URLs de imagens aqui
     ];
 
     const imageElement = document.getElementById("dynamicImage");
     const timeLabel = document.getElementById("timeLabel");
-
-    let previousHour = null; 
-    let selectedImage = ""; 
 
     function getRandomImage() {
       const randomIndex = Math.floor(Math.random() * images.length);
       return images[randomIndex];
     }
 
-    function updateImage() {
+    function getCurrentPeriod() {
       const now = new Date();
       const hour = now.getHours();
 
-      if (hour === previousHour) {
+      if (hour >= 8 && hour < 10) {
+        return "morning";
+      } else if (hour >= 10 && hour < 12) {
+        return "lateMorning";
+      } else if (hour >= 12 && hour < 15) {
+        return "afternoon";
+      } else if (hour >= 15 && hour < 19) {
+        return "evening";
+      } else if (hour >= 19 && hour < 21) {
+        return "night";
+      } else {
+        return "random";
+      }
+    }
+
+    function updateImage() {
+      const currentPeriod = getCurrentPeriod();
+      const storedData = JSON.parse(localStorage.getItem("sorteioData")) || {};
+
+      // Se o horário atual já possui uma imagem salva, exibe-a
+      if (storedData.period === currentPeriod && storedData.image) {
+        timeLabel.textContent = `Horário: ${storedData.displayTime}`;
+        imageElement.src = storedData.image;
+        imageElement.style.display = "block";
+        console.log("Imagem recuperada:", storedData.image);
         return;
       }
 
-      previousHour = hour; 
-      let displayTime = ""; 
+      // Caso contrário, sorteia uma nova imagem
+      const selectedImage = getRandomImage();
+      let displayTime = "";
 
-      if (hour >= 8 && hour < 10) {
-        displayTime = "10:00";
-      } else if (hour >= 10 && hour < 12) {
-        displayTime = "12:00";
-      } else if (hour >= 12 && hour < 15) {
-        displayTime = "15:00";
-      } else if (hour >= 15 && hour < 19) {
-        displayTime = "19:00";
-      } else if (hour >= 19 && hour < 21) {
-        displayTime = "21:00";
-      } else {
-        displayTime = "Horário aleatório";
+      switch (currentPeriod) {
+        case "morning":
+          displayTime = "10:00";
+          break;
+        case "lateMorning":
+          displayTime = "12:00";
+          break;
+        case "afternoon":
+          displayTime = "15:00";
+          break;
+        case "evening":
+          displayTime = "19:00";
+          break;
+        case "night":
+          displayTime = "21:00";
+          break;
+        default:
+          displayTime = "Horário aleatório";
+          break;
       }
 
-      selectedImage = getRandomImage();
+      // Salva a imagem e o horário no localStorage
+      localStorage.setItem(
+        "sorteioData",
+        JSON.stringify({ period: currentPeriod, image: selectedImage, displayTime })
+      );
 
+      // Atualiza a interface
       timeLabel.textContent = `Horário: ${displayTime}`;
       imageElement.src = selectedImage;
       imageElement.style.display = "block";
-
-      console.log("Imagem sorteada:", selectedImage);
+      console.log("Nova imagem sorteada:", selectedImage);
     }
 
     updateImage();
-
-    setInterval(updateImage, 120000);
 
     function enviarWhatsApp() {
       const telefone = "71992290058";
