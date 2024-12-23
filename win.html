@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link id="dynamicFavicon" rel="icon" href="https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/palpite.jpg" type="image/jpg">
+  <link id="dynamicFavicon" rel="icon" href="" type="image/jpg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <title>Palpite Diário</title>
@@ -110,7 +110,7 @@
         timeLabel.textContent = `Horário: ${storedData.displayTime}`;
         imageElement.src = storedData.image;
         imageElement.style.display = "block";
-        favicon.href = storedData.image; // Atualiza o favicon
+        favicon.href = `${storedData.image}?t=${new Date().getTime()}`; // Atualiza o favicon com cache busting
         console.log("Imagem recuperada:", storedData.image);
         return;
       }
@@ -150,7 +150,7 @@
       timeLabel.textContent = `Horário: ${displayTime}`;
       imageElement.src = selectedImage;
       imageElement.style.display = "block";
-      favicon.href = selectedImage; // Atualiza o favicon dinamicamente
+      favicon.href = `${selectedImage}?t=${new Date().getTime()}`; // Atualiza o favicon dinamicamente
       console.log("Nova imagem sorteada:", selectedImage);
     }
 
