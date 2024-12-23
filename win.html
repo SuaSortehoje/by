@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link id="dynamicFavicon" rel="icon" href="https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/palpite.jpg" type="image/jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <title>Palpite Diário</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: black;
+      margin: 0;
+    }
+    div {
+      font-size: 24px;
+      font-weight: bold;
+      position: absolute;
+      color: white;
+      margin-bottom: 150px;
+    }
+    img {
+      max-width: 150%;
+      max-height: 80%;
+      border: 1px solid red;
+      display: none;
+    }
+    .btn {
+      width: 78%;
+      height: 40px;
+      margin: 5px;
+      background: skyblue;
+    }
+    .btn:focus {
+      background: red;
+    }
+  </style>
+</head>
+<body>
+  <div id="timeLabel"></div>
+  <img id="dynamicImage" alt="Imagem dinâmica">
+  <button class="btn" onclick="enviarWhatsApp()" id="whatsapp">JOGAR</button>
+  <script>
+    const images = [
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image01.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image02.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image03.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image04.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image05.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image06.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image07.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image08.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image09.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image10.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image11.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image12.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image13.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image14.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image15.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image16.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image17.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image18.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image19.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image20.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image21.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image22.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image23.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image24.jpg",
+      "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image25.jpg",
+   
+    ];
+
+    const imageElement = document.getElementById("dynamicImage");
+    const timeLabel = document.getElementById("timeLabel");
+    const favicon = document.getElementById("dynamicFavicon");
+
+    function getRandomImage() {
+      const randomIndex = Math.floor(Math.random() * images.length);
+      return images[randomIndex];
+    }
+
+    function getCurrentPeriod() {
+      const now = new Date();
+      const hour = now.getHours();
+
+      if (hour >= 8 && hour < 10) {
+        return "morning";
+      } else if (hour >= 10 && hour < 12) {
+        return "lateMorning";
+      } else if (hour >= 12 && hour < 15) {
+        return "afternoon";
+      } else if (hour >= 15 && hour < 19) {
+        return "evening";
+      } else if (hour >= 19 && hour < 21) {
+        return "night";
+      } else {
+        return "random";
+      }
+    }
+
+    function updateImage() {
+      const currentPeriod = getCurrentPeriod();
+      const storedData = JSON.parse(localStorage.getItem("sorteioData")) || {};
+
+      // Se o horário atual já possui uma imagem salva, exibe-a
+      if (storedData.period === currentPeriod && storedData.image) {
+        timeLabel.textContent = `Horário: ${storedData.displayTime}`;
+        imageElement.src = storedData.image;
+        imageElement.style.display = "block";
+        favicon.href = storedData.image; // Atualiza o favicon
+        console.log("Imagem recuperada:", storedData.image);
+        return;
+      }
+
+      // Caso contrário, sorteia uma nova imagem
+      const selectedImage = getRandomImage();
+      let displayTime = "";
+
+      switch (currentPeriod) {
+        case "morning":
+          displayTime = "10:00";
+          break;
+        case "lateMorning":
+          displayTime = "12:00";
+          break;
+        case "afternoon":
+          displayTime = "15:00";
+          break;
+        case "evening":
+          displayTime = "19:00";
+          break;
+        case "night":
+          displayTime = "21:00";
+          break;
+        default:
+          displayTime = "Horário aleatório";
+          break;
+      }
+
+      // Salva a imagem e o horário no localStorage
+      localStorage.setItem(
+        "sorteioData",
+        JSON.stringify({ period: currentPeriod, image: selectedImage, displayTime })
+      );
+
+      // Atualiza a interface
+      timeLabel.textContent = `Horário: ${displayTime}`;
+      imageElement.src = selectedImage;
+      imageElement.style.display = "block";
+      favicon.href = selectedImage; // Atualiza o favicon dinamicamente
+      console.log("Nova imagem sorteada:", selectedImage);
+    }
+
+    updateImage();
+
+    function enviarWhatsApp() {
+      const telefone = "71992290058";
+      const mensagem = encodeURIComponent("Quero jogar");
+      const url = `https://wa.me/${telefone}?text=${mensagem}`;
+      window.open(url, "_blank");
+    }
+  </script>
+</body>
+</html>
