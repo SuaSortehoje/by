@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link id="dynamicFavicon" rel="icon" href="" type="image/jpg">
+  <link id="dynamicFavicon" rel="icon" href="https://example.com/default-favicon.jpg" type="image/jpg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <title>Palpite Diário</title>
@@ -82,88 +82,22 @@
       return images[randomIndex];
     }
 
-    function getCurrentPeriod() {
-      const now = new Date();
-      const hour = now.getHours();
-
-      if (hour >= 8 && hour < 10) {
-        return "morning";
-      } else if (hour >= 10 && hour < 12) {
-        return "lateMorning";
-      } else if (hour >= 12 && hour < 15) {
-        return "afternoon";
-      } else if (hour >= 15 && hour < 19) {
-        return "evening";
-      } else if (hour >= 19 && hour < 21) {
-        return "night";
-      } else {
-        return "random";
-      }
-    }
-
     function updateImage() {
-      const currentPeriod = getCurrentPeriod();
-      const storedData = JSON.parse(localStorage.getItem("sorteioData")) || {};
-
-      // Se o horário atual já possui uma imagem salva, exibe-a
-      if (storedData.period === currentPeriod && storedData.image) {
-        timeLabel.textContent = `Horário: ${storedData.displayTime}`;
-        imageElement.src = storedData.image;
-        imageElement.style.display = "block";
-        favicon.href = `${storedData.image}?t=${new Date().getTime()}`; // Atualiza o favicon com cache busting
-        console.log("Imagem recuperada:", storedData.image);
-        return;
-      }
-
-      // Caso contrário, sorteia uma nova imagem
       const selectedImage = getRandomImage();
-      let displayTime = "";
-
-      switch (currentPeriod) {
-        case "morning":
-          displayTime = "10:00";
-          break;
-        case "lateMorning":
-          displayTime = "12:00";
-          break;
-        case "afternoon":
-          displayTime = "15:00";
-          break;
-        case "evening":
-          displayTime = "19:00";
-          break;
-        case "night":
-          displayTime = "21:00";
-          break;
-        default:
-          displayTime = "Horário aleatório";
-          break;
-      }
-
-      // Salva a imagem e o horário no localStorage
-      localStorage.setItem(
-        "sorteioData",
-        JSON.stringify({ period: currentPeriod, image: selectedImage, displayTime })
-      );
-
-      // Atualiza a interface
-      timeLabel.textContent = `Horário: ${displayTime}`;
+      timeLabel.textContent = "Palpite do dia!";
       imageElement.src = selectedImage;
       imageElement.style.display = "block";
-      favicon.href = `${selectedImage}?t=${new Date().getTime()}`; // Atualiza o favicon dinamicamente
+
+      // Atualiza o favicon dinamicamente
+      favicon.href = `${selectedImage}?t=${new Date().getTime()}`;
       console.log("Nova imagem sorteada:", selectedImage);
     }
 
     updateImage();
 
     function enviarWhatsApp() {
-    window.location.href = "https://parceiros.jbpopular.com/pagead?token=adc66470f8b6cfd7aace53ac655c5e7b"; }
-      
+      window.location.href = "https://parceiros.jbpopular.com/pagead?token=adc66470f8b6cfd7aace53ac655c5e7b";
+    }
   </script>
-  <!--const telefone = "71992290058";
-      const mensagem = encodeURIComponent("Quero jogar");
-      const url = `https://wa.me/${telefone}?text=${mensagem}`;
-      window.open(url, "_blank");-->
-    
 </body>
 </html>
