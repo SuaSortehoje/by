@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
   <link id="dynamicFavicon" rel="icon" href="https://example.com/default-favicon.jpg" type="image/jpg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -70,7 +70,6 @@
       "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image23.jpg",
       "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image24.jpg",
       "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image25.jpg",
-      // Adicione mais URLs de imagens aqui
     ];
 
     const imageElement = document.getElementById("dynamicImage");
@@ -89,8 +88,24 @@
       imageElement.style.display = "block";
 
       // Atualiza o favicon dinamicamente
-      favicon.href = `${selectedImage}?t=${new Date().getTime()}`;
+      updateFavicon(selectedImage);
       console.log("Nova imagem sorteada:", selectedImage);
+    }
+
+    function updateFavicon(imageUrl) {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+
+      canvas.width = 32; // Tamanho do favicon
+      canvas.height = 32;
+
+      img.crossOrigin = "anonymous"; // Permite carregar imagens externas
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        favicon.href = canvas.toDataURL("image/png");
+      };
+      img.src = imageUrl;
     }
 
     updateImage();
