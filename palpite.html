@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PALPITE DA SORTE</title>
+    <title>Imagens e Horários</title>
     <!-- Favicon inicial -->
     <link id="favicon" rel="icon" type="image/png" href="https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image01.jpg">
     <style> 
@@ -94,11 +94,9 @@
     </div>
     <div>
         <button class="btn" onclick="enviarWhatsApp()">JOGAR</button>
-     
     </div>
 
     <script>
-        // Array de URLs de imagens
         const images = [
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image01.jpg",
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image02.jpg",
@@ -124,10 +122,9 @@
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image22.jpg",
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image23.jpg",
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image24.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image25.jpg"
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image25.jpg",
         ];
 
-        // Array de URLs de ícones (favicons)
         const favicons = ["https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image01.jpg",
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image02.jpg",
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image03.jpg",
@@ -152,14 +149,12 @@
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image22.jpg",
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image23.jpg",
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image24.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image25.jpg"]; // Ícones iguais às imagens
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image25.jpg",]; // Reutilizando as mesmas URLs para favicons
 
-        // Função para gerar um índice aleatório
         function getRandomImageIndex() {
             return Math.floor(Math.random() * images.length);
         }
 
-        // Função para determinar a imagem, horário e ícone baseado no horário atual
         function updateImageAndTime() {
             const now = new Date();
             const hours = now.getHours();
@@ -190,42 +185,18 @@
                 return;
             }
 
-            // Salva a imagem e o horário no localStorage
-            localStorage.setItem('imageIndex', imageIndex);
-            localStorage.setItem('displayTime', displayTime);
-
-            // Atualiza a imagem e o horário
             document.getElementById("displayed-image").src = images[imageIndex];
             document.getElementById("time-info").textContent = `Próximo horário: ${displayTime}`;
-            document.getElementById("favicon").href = favicons[imageIndex];
+            document.getElementById("favicon").href = `${favicons[imageIndex]}?v=${new Date().getTime()}`;
             document.getElementById("loading-message").style.display = "none";
         }
 
-        // Função para carregar a imagem e horário do localStorage
-        function loadImageAndTimeFromStorage() {
-            const imageIndex = localStorage.getItem('imageIndex');
-            const displayTime = localStorage.getItem('displayTime');
-
-            if (imageIndex !== null && displayTime !== null) {
-                document.getElementById("displayed-image").src = images[imageIndex];
-                document.getElementById("time-info").textContent = `Próximo horário: ${displayTime}`;
-                document.getElementById("favicon").href = favicons[imageIndex];
-                document.getElementById("loading-message").style.display = "none";
-            } else {
-                updateImageAndTime();
-            }
-        }
-
-        // Carrega a imagem e horário do localStorage ao carregar a página
-        loadImageAndTimeFromStorage();
-
-        // Atualiza a cada minuto para garantir a precisão
-        setInterval(updateImageAndTime, 60000);
-
-        // Função para redirecionar para o WhatsApp
         function enviarWhatsApp() {
             window.location.href = "https://parceiros.jbpopular.com/pagead?token=adc66470f8b6cfd7aace53ac655c5e7b";
         }
+
+        updateImageAndTime();
+        setInterval(updateImageAndTime, 60000); // Atualiza a cada minuto
     </script>
 </body>
 </html>
