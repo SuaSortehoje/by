@@ -122,9 +122,22 @@
             if (hours < 12) return "12:00";
             if (hours < 15) return "15:00";
             if (hours < 19) return "19:00";
-            if (hours < 21) return "21:00";
-            return "06:00"; // Volta para o próximo dia
+            if (hours < 22) return "22:00";
+            else {
+                document.getElementById("displayed-image").src = "";
+                document.getElementById("time-info").textContent = "Imagens não disponíveis até 06:00.";
+                document.getElementById("favicon").href = ""; // Remove o ícone
+                document.getElementById("loading-message").style.display = "none";
+                return;
+            }
+
+            document.getElementById("displayed-image").src = images[imageIndex];
+            document.getElementById("time-info").textContent = `Próximo horário: ${displayTime}`;
+            document.getElementById("favicon").href = `${favicons[imageIndex]}?v=${new Date().getTime()}`;
+            document.getElementById("loading-message").style.display = "none";
         }
+
+        
 
         function updateImageAndTime() {
             const now = new Date();
