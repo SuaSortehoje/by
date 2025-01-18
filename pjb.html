@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link id="dynamicFavicon" rel="icon" href="https://example.com/default-favicon.jpg" type="image/jpg">
+  <link id="dynamicFavicon" rel="icon" href="https://example.com/default-favicon.jpg" type="image/png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <title>Palpite Diário</title>
@@ -93,16 +93,16 @@
     }
 
     function updateFavicon(imageUrl) {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
       const img = new Image();
-
-      canvas.width = 32; // Tamanho do favicon
-      canvas.height = 32;
-
       img.crossOrigin = "anonymous"; // Permite carregar imagens externas
       img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = 32;
+        canvas.height = 32;
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // Define o favicon como o dataURL da imagem
         favicon.href = canvas.toDataURL("image/png");
       };
       img.src = imageUrl;
@@ -115,5 +115,4 @@
     }
   </script>
 </body>
-      </html>
-      
+</html>
