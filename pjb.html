@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Imagens e Horários</title>
-    <link id="favicon" rel="icon" type="image/png" href="https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image01.jpg">
+    <title>Palpite Diário</title>
+    <link id="favicon" rel="icon" type="image/png" href="default.png">
     <style>
         body {
             background: blue;
@@ -34,19 +34,18 @@
 
         #time-info {
             font-size: 24px;
-      font-weight: bold;
-      position: absolute;
-      color: white;
-      margin-top: 80px;
-      text-align: center;
-      margin-left:15%;
+            font-weight: bold;
+            position: relative;
+            color: white;
+            margin-top: 20px;
+            text-align: center;
         }
 
         .btn {
             display: block;
             width: 90%;
             max-width: 300px;
-            margin: 5px auto;
+            margin: 10px auto;
             background: skyblue;
             color: black;
             font-size: 16px;
@@ -54,6 +53,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            padding: 10px;
         }
 
         .btn:hover {
@@ -70,11 +70,9 @@
 </head>
 <body>
     <h1>PALPITE DIÁRIO</h1>
-     <p id="time-info"></p>
+    <p id="time-info"></p>
     <div id="image-container">
-         
-        <img id="displayed-image" src="" alt="Imagem">
-        
+        <img id="displayed-image" src="default.png" alt="Imagem">
     </div>
     <button class="btn" onclick="enviarWhatsApp()">JOGAR</button>
 
@@ -97,7 +95,7 @@
             if (hours < 15) return "15:00";
             if (hours < 19) return "19:00";
             if (hours < 22) return "22:00";
-            return "06:00"; // Volta para o próximo dia
+            return "06:00"; // Próximo dia
         }
 
         function updateImageAndTime() {
@@ -112,13 +110,12 @@
                 localStorage.setItem("timeSlot", currentSlot);
                 localStorage.setItem("imageIndex", newImageIndex);
 
-                // Atualiza a imagem e o favicon
                 const newImage = images[newImageIndex];
                 document.getElementById("displayed-image").src = newImage;
                 document.getElementById("favicon").href = `${newImage}?v=${new Date().getTime()}`;
                 document.getElementById("time-info").textContent = `Próximo horário: ${currentSlot}`;
             } else if (storedImageIndex !== null) {
-                // Se o horário não mudou, mantém a imagem atual
+                // Mantém a imagem e o favicon atual
                 const storedImage = images[storedImageIndex];
                 document.getElementById("displayed-image").src = storedImage;
                 document.getElementById("favicon").href = `${storedImage}?v=${new Date().getTime()}`;
@@ -133,7 +130,7 @@
         // Inicializa ao carregar a página
         updateImageAndTime();
 
-        // Verifica a cada minuto
+        // Atualiza a cada minuto
         setInterval(updateImageAndTime, 60000);
     </script>
 </body>
