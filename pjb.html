@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palpite Diário</title>
-    <link id="favicon" rel="icon" type="image/png" href="default.png">
+    <link id="favicon" rel="icon" type="image/png" href="">
     <style>
         body {
             background: blue;
@@ -72,7 +72,7 @@
     <h1>PALPITE DIÁRIO</h1>
     <p id="time-info"></p>
     <div id="image-container">
-        <img id="displayed-image" src="default.png" alt="Imagem">
+        <img id="displayed-image" src="" alt="Imagem">
     </div>
     <button class="btn" onclick="enviarWhatsApp()">JOGAR</button>
 
@@ -84,6 +84,33 @@
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image04.jpg",
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image05.jpg"
         ];
+
+        function getRandomImage() {
+            const randomIndex = Math.floor(Math.random() * images.length);
+            return images[randomIndex];
+        }
+
+        function updateImageAndFavicon() {
+            const now = new Date();
+            const currentSlot = getNextTimeSlot();
+            const storedSlot = localStorage.getItem("timeSlot");
+
+            if (currentSlot !== storedSlot) {
+                const newImage = getRandomImage();
+                localStorage.setItem("timeSlot", currentSlot);
+                localStorage.setItem("imageIndex", images.indexOf(newImage));
+
+                document.getElementById("displayed-image").src = newImage;
+                document.getElementById("favicon").href = `${newImage}?v=${now.getTime()}`;
+                document.getElementById("time-info").textContent = `Próximo horário: ${currentSlot}`;
+            } else {
+                const storedImageIndex = localStorage.getItem("imageIndex");
+                const storedImage = images[storedImageIndex];
+                document.getElementById("displayed-image").src = storedImage;
+                document.getElementById("favicon").href = `${storedImage}?v=${now.getTime()}`;
+                document.getElementById("time-info").textContent = `Próximo horário: ${storedSlot}`;
+            }
+        }
 
         function getNextTimeSlot() {
             const now = new Date();
@@ -98,40 +125,15 @@
             return "06:00"; // Próximo dia
         }
 
-        function updateImageAndTime() {
-            const now = new Date();
-            const currentSlot = getNextTimeSlot();
-            const storedSlot = localStorage.getItem("timeSlot");
-            const storedImageIndex = localStorage.getItem("imageIndex");
-
-            // Se o horário mudou, gera uma nova imagem
-            if (currentSlot !== storedSlot) {
-                const newImageIndex = Math.floor(Math.random() * images.length);
-                localStorage.setItem("timeSlot", currentSlot);
-                localStorage.setItem("imageIndex", newImageIndex);
-
-                const newImage = images[newImageIndex];
-                document.getElementById("displayed-image").src = newImage;
-                document.getElementById("favicon").href = `${newImage}?v=${new Date().getTime()}`;
-                document.getElementById("time-info").textContent = `Próximo horário: ${currentSlot}`;
-            } else if (storedImageIndex !== null) {
-                // Mantém a imagem e o favicon atual
-                const storedImage = images[storedImageIndex];
-                document.getElementById("displayed-image").src = storedImage;
-                document.getElementById("favicon").href = `${storedImage}?v=${new Date().getTime()}`;
-                document.getElementById("time-info").textContent = `Próximo horário: ${storedSlot}`;
-            }
-        }
-
         function enviarWhatsApp() {
             window.location.href = "https://parceiros.jbpopular.com/pagead?token=adc66470f8b6cfd7aace53ac655c5e7b";
         }
 
         // Inicializa ao carregar a página
-        updateImageAndTime();
+        updateImageAndFavicon();
 
         // Atualiza a cada minuto
-        setInterval(updateImageAndTime, 60000);
+        setInterval(updateImageAndFavicon, 60000);
     </script>
 </body>
 </html>
