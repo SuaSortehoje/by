@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palpite Diário</title>
-    <link id="favicon" rel="icon" type="image/png" href="">
+    <link id="favicon" rel="icon" type="image/jpg" href="https://example.com/default-favicon.jpg">
     <style>
         body {
             background: blue;
@@ -82,27 +82,7 @@
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image02.jpg",
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image03.jpg",
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image04.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image05.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image06.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image07.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image08.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image09.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image10.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image11.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image12.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image13.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image14.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image15.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image16.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image17.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image18.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image19.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image20.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image21.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image22.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image23.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image24.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image25.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image05.jpg"
         ];
 
         function getNextTimeSlot() {
@@ -118,6 +98,24 @@
             return "06:00"; // Volta para o próximo dia
         }
 
+        function setFavicon(imageUrl) {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const img = new Image();
+
+            canvas.width = 64;
+            canvas.height = 64;
+
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, 64, 64);
+                const faviconUrl = canvas.toDataURL("image/png");
+                document.getElementById("favicon").href = faviconUrl;
+            };
+
+            img.crossOrigin = "anonymous";
+            img.src = imageUrl;
+        }
+
         function updateImageAndTime() {
             const now = new Date();
             const currentSlot = getNextTimeSlot();
@@ -131,12 +129,12 @@
 
                 const newImage = images[newImageIndex];
                 document.getElementById("displayed-image").src = newImage;
-                document.getElementById("favicon").href = newImage;
+                setFavicon(newImage);
                 document.getElementById("time-info").textContent = `Próximo horário: ${currentSlot}`;
             } else if (storedImageIndex !== null) {
                 const storedImage = images[storedImageIndex];
                 document.getElementById("displayed-image").src = storedImage;
-                document.getElementById("favicon").href = storedImage;
+                setFavicon(storedImage);
                 document.getElementById("time-info").textContent = `Próximo horário: ${storedSlot}`;
             }
         }
