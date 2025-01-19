@@ -35,17 +35,18 @@
         #time-info {
             font-size: 24px;
             font-weight: bold;
-            position: relative;
+            position: absolute;
             color: white;
-            margin-top: 20px;
+            margin-top: 80px;
             text-align: center;
+            margin-left: 15%;
         }
 
         .btn {
             display: block;
             width: 90%;
             max-width: 300px;
-            margin: 10px auto;
+            margin: 5px auto;
             background: skyblue;
             color: black;
             font-size: 16px;
@@ -53,7 +54,6 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            padding: 10px;
         }
 
         .btn:hover {
@@ -82,35 +82,28 @@
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image02.jpg",
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image03.jpg",
             "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image04.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image05.jpg"
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image05.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image06.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image07.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image08.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image09.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image10.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image11.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image12.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image13.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image14.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image15.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image16.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image17.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image18.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image19.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image20.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image21.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image22.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image23.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image24.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image25.jpg",
         ];
-
-        function getRandomImage() {
-            const randomIndex = Math.floor(Math.random() * images.length);
-            return images[randomIndex];
-        }
-
-        function updateImageAndFavicon() {
-            const now = new Date();
-            const currentSlot = getNextTimeSlot();
-            const storedSlot = localStorage.getItem("timeSlot");
-
-            if (currentSlot !== storedSlot) {
-                const newImage = getRandomImage();
-                localStorage.setItem("timeSlot", currentSlot);
-                localStorage.setItem("imageIndex", images.indexOf(newImage));
-
-                document.getElementById("displayed-image").src = newImage;
-                document.getElementById("favicon").href = `${newImage}?v=${now.getTime()}`;
-                document.getElementById("time-info").textContent = `Próximo horário: ${currentSlot}`;
-            } else {
-                const storedImageIndex = localStorage.getItem("imageIndex");
-                const storedImage = images[storedImageIndex];
-                document.getElementById("displayed-image").src = storedImage;
-                document.getElementById("favicon").href = `${storedImage}?v=${now.getTime()}`;
-                document.getElementById("time-info").textContent = `Próximo horário: ${storedSlot}`;
-            }
-        }
 
         function getNextTimeSlot() {
             const now = new Date();
@@ -122,18 +115,38 @@
             if (hours < 15) return "15:00";
             if (hours < 19) return "19:00";
             if (hours < 22) return "22:00";
-            return "06:00"; // Próximo dia
+            return "06:00"; // Volta para o próximo dia
+        }
+
+        function updateImageAndTime() {
+            const now = new Date();
+            const currentSlot = getNextTimeSlot();
+            const storedSlot = localStorage.getItem("timeSlot");
+            const storedImageIndex = localStorage.getItem("imageIndex");
+
+            if (currentSlot !== storedSlot) {
+                const newImageIndex = Math.floor(Math.random() * images.length);
+                localStorage.setItem("timeSlot", currentSlot);
+                localStorage.setItem("imageIndex", newImageIndex);
+
+                const newImage = images[newImageIndex];
+                document.getElementById("displayed-image").src = newImage;
+                document.getElementById("favicon").href = newImage;
+                document.getElementById("time-info").textContent = `Próximo horário: ${currentSlot}`;
+            } else if (storedImageIndex !== null) {
+                const storedImage = images[storedImageIndex];
+                document.getElementById("displayed-image").src = storedImage;
+                document.getElementById("favicon").href = storedImage;
+                document.getElementById("time-info").textContent = `Próximo horário: ${storedSlot}`;
+            }
         }
 
         function enviarWhatsApp() {
             window.location.href = "https://parceiros.jbpopular.com/pagead?token=adc66470f8b6cfd7aace53ac655c5e7b";
         }
 
-        // Inicializa ao carregar a página
-        updateImageAndFavicon();
-
-        // Atualiza a cada minuto
-        setInterval(updateImageAndFavicon, 60000);
+        updateImageAndTime();
+        setInterval(updateImageAndTime, 60000);
     </script>
 </body>
 </html>
