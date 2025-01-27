@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palpite Diário</title>
-    <link id="favicon" rel="icon" type="image/jpg" href="https://example.com/default-favicon.jpg">
+    <!-- Ícone padrão inicial -->
+    <link id="favicon" rel="icon" type="image/png" href="https://example.com/default-favicon.jpg">
     <style>
         body {
             background: blue;
@@ -69,7 +70,7 @@
     </style>
 </head>
 <body>
-    <h1>PALPITE DIÁRIO</h1>
+    <h1>PALPITE da SORTE DIÁRIO</h1>
     <p id="time-info"></p>
     <div id="image-container">
         <img id="displayed-image" src="" alt="Imagem">
@@ -86,7 +87,7 @@
                 "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image05.jpg"
             ];
 
-            // Função para definir o favicon
+            // Função para definir o favicon igual à imagem principal
             function setFavicon(imageUrl) {
                 const canvas = document.createElement("canvas");
                 const ctx = canvas.getContext("2d");
@@ -105,7 +106,7 @@
                 img.src = imageUrl;
             }
 
-            // Função para determinar o próximo horário
+            // Função que calcula o próximo horário
             function getNextTimeSlot() {
                 const now = new Date();
                 const hours = now.getHours();
@@ -119,28 +120,20 @@
                 return "06:00"; // Volta para o próximo dia
             }
 
-            // Atualiza a imagem e o horário
-            function updateImageAndTime() {
-                const now = new Date();
-                const currentSlot = getNextTimeSlot();
-                const storedSlot = localStorage.getItem("timeSlot");
-                const storedImageIndex = localStorage.getItem("imageIndex");
+            // Atualiza a imagem e define o favicon
+            function updateImageAndFavicon() {
+                const imageIndex = Math.floor(Math.random() * images.length);
+                const selectedImage = images[imageIndex];
 
-                if (currentSlot !== storedSlot) {
-                    const newImageIndex = Math.floor(Math.random() * images.length);
-                    localStorage.setItem("timeSlot", currentSlot);
-                    localStorage.setItem("imageIndex", newImageIndex);
+                // Define a imagem principal
+                document.getElementById("displayed-image").src = selectedImage;
 
-                    const newImage = images[newImageIndex];
-                    document.getElementById("displayed-image").src = newImage;
-                    setFavicon(newImage);
-                    document.getElementById("time-info").textContent = `Próximo horário: ${currentSlot}`;
-                } else if (storedImageIndex !== null) {
-                    const storedImage = images[storedImageIndex];
-                    document.getElementById("displayed-image").src = storedImage;
-                    setFavicon(storedImage);
-                    document.getElementById("time-info").textContent = `Próximo horário: ${storedSlot}`;
-                }
+                // Define o favicon com base na imagem principal
+                setFavicon(selectedImage);
+
+                // Atualiza a informação do próximo horário
+                const nextTimeSlot = getNextTimeSlot();
+                document.getElementById("time-info").textContent = `Próximo horário: ${nextTimeSlot}`;
             }
 
             // Função para redirecionar ao WhatsApp
@@ -148,13 +141,8 @@
                 window.location.href = "https://parceiros.jbpopular.com/pagead?token=adc66470f8b6cfd7aace53ac655c5e7b";
             }
 
-            // Configura o favicon no carregamento da página
-            const randomImage = images[Math.floor(Math.random() * images.length)];
-            setFavicon(randomImage);
-
-            // Atualiza a imagem e o tempo
-            updateImageAndTime();
-            setInterval(updateImageAndTime, 60000);
+            // Atualiza a imagem principal e o favicon ao carregar a página
+            updateImageAndFavicon();
 
             // Torna a função enviarWhatsApp acessível globalmente
             window.enviarWhatsApp = enviarWhatsApp;
