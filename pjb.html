@@ -77,74 +77,88 @@
     <button class="btn" onclick="enviarWhatsApp()">JOGAR</button>
 
     <script>
-        const images = [
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image01.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image02.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image03.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image04.jpg",
-            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image05.jpg"
-        ];
+        document.addEventListener("DOMContentLoaded", () => {
+            const images = [
+                "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image01.jpg",
+                "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image02.jpg",
+                "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image03.jpg",
+                "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image04.jpg",
+                "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image05.jpg"
+            ];
 
-        function getNextTimeSlot() {
-            const now = new Date();
-            const hours = now.getHours();
-            const minutes = now.getMinutes();
+            // Função para definir o favicon
+            function setFavicon(imageUrl) {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                const img = new Image();
 
-            if (hours < 10 || (hours === 9 && minutes <= 59)) return "10:00";
-            if (hours < 12) return "12:00";
-            if (hours < 15) return "15:00";
-            if (hours < 19) return "19:00";
-            if (hours < 22) return "22:00";
-            return "06:00"; // Volta para o próximo dia
-        }
+                canvas.width = 64;
+                canvas.height = 64;
 
-        function setFavicon(imageUrl) {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            const img = new Image();
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, 64, 64);
+                    const faviconUrl = canvas.toDataURL("image/png");
+                    document.getElementById("favicon").href = faviconUrl;
+                };
 
-            canvas.width = 64;
-            canvas.height = 64;
-
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0, 64, 64);
-                const faviconUrl = canvas.toDataURL("image/png");
-                document.getElementById("favicon").href = faviconUrl;
-            };
-
-            img.crossOrigin = "anonymous";
-            img.src = imageUrl;
-        }
-
-        function updateImageAndTime() {
-            const now = new Date();
-            const currentSlot = getNextTimeSlot();
-            const storedSlot = localStorage.getItem("timeSlot");
-            const storedImageIndex = localStorage.getItem("imageIndex");
-
-            if (currentSlot !== storedSlot) {
-                const newImageIndex = Math.floor(Math.random() * images.length);
-                localStorage.setItem("timeSlot", currentSlot);
-                localStorage.setItem("imageIndex", newImageIndex);
-
-                const newImage = images[newImageIndex];
-                document.getElementById("displayed-image").src = newImage;
-                setFavicon(newImage);
-                document.getElementById("time-info").textContent = `Próximo horário: ${currentSlot}`;
-            } else if (storedImageIndex !== null) {
-                const storedImage = images[storedImageIndex];
-                document.getElementById("displayed-image").src = storedImage;
-                setFavicon(storedImage);
-                document.getElementById("time-info").textContent = `Próximo horário: ${storedSlot}`;
+                img.crossOrigin = "anonymous";
+                img.src = imageUrl;
             }
-        }
 
-        function enviarWhatsApp() {
-            window.location.href = "https://parceiros.jbpopular.com/pagead?token=adc66470f8b6cfd7aace53ac655c5e7b";
-        }
+            // Função para determinar o próximo horário
+            function getNextTimeSlot() {
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
 
-        updateImageAndTime();
-        setInterval(updateImageAndTime, 60000);
+                if (hours < 10 || (hours === 9 && minutes <= 59)) return "10:00";
+                if (hours < 12) return "12:00";
+                if (hours < 15) return "15:00";
+                if (hours < 19) return "19:00";
+                if (hours < 22) return "22:00";
+                return "06:00"; // Volta para o próximo dia
+            }
+
+            // Atualiza a imagem e o horário
+            function updateImageAndTime() {
+                const now = new Date();
+                const currentSlot = getNextTimeSlot();
+                const storedSlot = localStorage.getItem("timeSlot");
+                const storedImageIndex = localStorage.getItem("imageIndex");
+
+                if (currentSlot !== storedSlot) {
+                    const newImageIndex = Math.floor(Math.random() * images.length);
+                    localStorage.setItem("timeSlot", currentSlot);
+                    localStorage.setItem("imageIndex", newImageIndex);
+
+                    const newImage = images[newImageIndex];
+                    document.getElementById("displayed-image").src = newImage;
+                    setFavicon(newImage);
+                    document.getElementById("time-info").textContent = `Próximo horário: ${currentSlot}`;
+                } else if (storedImageIndex !== null) {
+                    const storedImage = images[storedImageIndex];
+                    document.getElementById("displayed-image").src = storedImage;
+                    setFavicon(storedImage);
+                    document.getElementById("time-info").textContent = `Próximo horário: ${storedSlot}`;
+                }
+            }
+
+            // Função para redirecionar ao WhatsApp
+            function enviarWhatsApp() {
+                window.location.href = "https://parceiros.jbpopular.com/pagead?token=adc66470f8b6cfd7aace53ac655c5e7b";
+            }
+
+            // Configura o favicon no carregamento da página
+            const randomImage = images[Math.floor(Math.random() * images.length)];
+            setFavicon(randomImage);
+
+            // Atualiza a imagem e o tempo
+            updateImageAndTime();
+            setInterval(updateImageAndTime, 60000);
+
+            // Torna a função enviarWhatsApp acessível globalmente
+            window.enviarWhatsApp = enviarWhatsApp;
+        });
     </script>
 </body>
 </html>
