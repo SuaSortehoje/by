@@ -39,8 +39,8 @@
       font-size: 16px;
     }
     .controls button {
-      display:flex;
-      height:40px;
+      display: flex;
+      height: 40px;
       text-align: center;
       background: #444;
       width: 70px;
@@ -89,7 +89,7 @@
       width: 100vw;
       height: 100vh;
       background-color: rgba(0, 0, 0, 0.8);
-      display: none;
+      display: flex;
       justify-content: center;
       align-items: center;
       z-index: 9999;
@@ -99,11 +99,14 @@
       color: black;
       padding: 30px;
       font-size:16px;
-      font-weight:bold;
+      color-weight:bold;
       border-radius: 10px;
       text-align: center;
       max-width: 400px;
       box-shadow: 0 0 20px black;
+    }
+    .modal-content h2 {
+      margin-top: 0;
     }
     .modal-content button {
       margin-top: 20px;
@@ -117,9 +120,32 @@
     .modal-content button:hover {
       background: #666;
     }
-    #contador {
-      font-size: 24px;
-      color: red;
+    p{
+      font-size:16px;
+      font-weight:bold;
+    }
+    @keyframes liberadoAnimacao {
+      0% { transform: scale(1); box-shadow: 0 0 0px red; }
+      50% { transform: scale(1.05); box-shadow: 0 0 20px lime; }
+      100% { transform: scale(1); box-shadow: 0 0 0px red; }
+    }
+    .liberado {
+      animation: liberadoAnimacao 1s ease-in-out 5;
+    }
+    #mensagemLiberado {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: lime;
+      color: black;
+      font-weight: bold;
+      font-size: 22px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px lime;
+      z-index: 9999;
+      display: none;
     }
     .controlls {
       display: flex;
@@ -129,7 +155,7 @@
       padding: 10px;
       border: none;
       border-radius: 5px;
-      font-size: 16px;   
+      font-size: 16px;  
       background: #444;
       width: 95%;
       color: white;
@@ -139,24 +165,13 @@
 </head>
 <body>
 
-  <!-- Modal de boas-vindas -->
-  <div class="modal" id="popupModal" style="display: flex;">
+  <div class="modal" id="popupModal">
     <div class="modal-content">
       <h2>Bem-vindo ao IPTV-Newtech</h2>
       <p>1° Acesse o Site e Aguarde o download</p>
-      <p>2° http</p>
-      <p>3° Clique para procurar o arquivo</p>
-      <p>4° Arquivo por nome playlist</p>
-      <p>5° Clique em play após carregar o arquivo</p>
+      <p>2° Selecione o arquivo .m3u</p>
+      <p>3° Clique em "Play" após carregar o arquivo</p>
       <button onclick="fecharModal()">Fechar</button>
-    </div>
-  </div>
-
-  <!-- Modal de contagem -->
-  <div class="modal" id="contagemModal">
-    <div class="modal-content">
-      <h2>Processando a Playlist</h2>
-      <p>Aguarde <span id="contador">180</span> segundos...</p>
     </div>
   </div>
 
@@ -172,7 +187,6 @@
     <label for="m3uFile">Adicionar Arquivo</label>
     <input class="buscar" type="text" id="buscaInput" placeholder="Buscar canal..." oninput="filtrarCanais()">
   </div>
-
   <div class="controlls">
     <button onclick="filtrarCategoria('canal')">Canais</button>
     <button onclick="filtrarCategoria('filme')">Filmes</button>
@@ -182,8 +196,7 @@
 
   <div class="canal-lista" id="listaCanais"></div>
 
-  <!-- HLS.js (para suporte a M3U8) -->
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <div id="mensagemLiberado">Player liberado!</div>
 
   <script>
     const video = document.getElementById('iptvPlayer');
@@ -192,11 +205,15 @@
     const buscaInput = document.getElementById('buscaInput');
     const modal = document.getElementById('popupModal');
     const contagemModal = document.getElementById('contagemModal');
-    const contador = document.getElementById('contador');
 
     let canais = [];
     let canaisFiltrados = [];
-    let bloqueado = true;
+    let bloqueado = false;
+    let contador = 180;  // 3 minutos em segundos
+
+    window.onload = () => {
+      modal.style.display = 'flex';
+    };
 
     function fecharModal() {
       modal.style.display = 'none';
@@ -204,7 +221,12 @@
 
     m3uInput.addEventListener('change', function () {
       const file = m3uInput.files[0];
-      if (!file) return;
+
+      // Verifica se o arquivo tem extensão .m3u ou .m3u8
+      if (!file || (!file.name.endsWith('.m3u') && !file.name.endsWith('.m3u8'))) {
+        alert('Por favor, adicione um arquivo .m3u ou .m3u8');
+        return;
+      }
 
       const reader = new FileReader();
       reader.onload = function (e) {
@@ -212,7 +234,7 @@
         canais = parseM3U(conteudo);
         canaisFiltrados = [...canais];
         renderizarCanais();
-        iniciarContagemRegressiva(); // iniciar contador após carregar
+        iniciarContagemRegressiva();
       };
       reader.readAsText(file);
     });
@@ -223,9 +245,9 @@
 
       for (let i = 0; i < linhas.length; i++) {
         if (linhas[i].startsWith('#EXTINF')) {
-          const match = linhas[i].match(/group-title="([^"]+)".*,(.*)/) || linhas[i].match(/#EXTINF.*,(.*)/);
-          const grupo = match && match[1] ? match[1] : 'Sem grupo';
-          const titulo = match && match[2] ? match[2] : match[1] || 'Sem título';
+          const match = linhas[i].match(/group-title="([^"]+)".*,(.*)/);
+          const grupo = match ? match[1] : '';
+          const titulo = match ? match[2] : (linhas[i].split(',')[1]?.trim() || 'Sem título');
           const url = linhas[i + 1]?.trim();
           if (url && url.startsWith('http')) {
             lista.push({ titulo: `${titulo} [${grupo}]`, url });
@@ -233,29 +255,18 @@
         }
       }
 
-      console.log("Canais carregados:", lista); // Log para verificar os canais carregados
       return lista;
     }
 
     function renderizarCanais() {
       listaCanais.innerHTML = '';
+
       canaisFiltrados.forEach(canal => {
         const btn = document.createElement('button');
         btn.textContent = canal.titulo;
         btn.onclick = () => {
-          if (!bloqueado) {
-            // Usando HLS.js para .m3u8
-            if (Hls.isSupported()) {
-              const hls = new Hls();
-              hls.loadSource(canal.url);
-              hls.attachMedia(video);
-            } else {
-              video.src = canal.url;
-            }
-            video.play();
-          } else {
-            alert("Aguarde o tempo de liberação!");
-          }
+          video.src = canal.url;
+          video.play();
         };
         listaCanais.appendChild(btn);
       });
@@ -280,20 +291,29 @@
 
     function iniciarContagemRegressiva() {
       bloqueado = true;
-      let tempo = 60;
-      contador.textContent = tempo;
-      contagemModal.style.display = 'flex';
+      const intervalo = setInterval(() => {
+        const minutos = Math.floor(contador / 60);
+        const segundos = contador % 60;
+        contagemModal.innerHTML = `Aguarde... <br> ${minutos}:${segundos}`;
+        contador--;
 
-      const interval = setInterval(() => {
-        tempo--;
-        contador.textContent = tempo;
-        if (tempo <= 0) {
-          clearInterval(interval);
+        if (contador < 0) {
+          clearInterval(intervalo);
           contagemModal.style.display = 'none';
           bloqueado = false;
+
+          // Exibe animação e mensagem
+          video.classList.add('liberado');
+          const msg = document.getElementById('mensagemLiberado');
+          msg.style.display = 'block';
+          setTimeout(() => {
+            msg.style.display = 'none';
+            video.classList.remove('liberado');
+          }, 5000);
         }
       }, 1000);
     }
   </script>
+
 </body>
 </html>
