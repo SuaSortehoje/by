@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>IPTV M3U</title>
+  <style>
+    body {
+      background: #222;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .iptv {
+      width: 100%;
+      max-height: 70vh;
+      background: black;
+      border: 2px solid red;
+      display: block;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 2px;
+    }
+    .controls input[type="file"],
+    .controls input[type="text"],
+    .controls button,
+    label[for="m3uFile"] {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .controls button {
+      display:flex;
+      height:40px;
+      text-align: center;
+      background: #444;
+      width: 70px;
+      color: white;
+      cursor: pointer;
+    }
+    .controls button:hover,
+    label[for="m3uFile"]:hover {
+      background: #666;
+    }
+    .canal-lista {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .canal-lista button {
+      padding: 10px;
+      background: #111;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+    .canal-lista button:hover {
+      background: #333;
+    }
+    .ocultarFile {
+      display: none;
+    }
+    .buscar {
+      width: 150px;
+    }
+    label[for="m3uFile"] {
+      display: inline-block;
+      cursor: pointer;
+      background: #444;
+      color: white;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .modal-content {
+      background: white;
+      color: black;
+      padding: 30px;
+      font-size:16px;
+      font-weight:bold;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: 0 0 20px black;
+    }
+    .modal-content button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal-content button:hover {
+      background: #666;
+    }
+    #contador {
+      font-size: 24px;
+      color: red;
+    }
+    .controlls {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 5px;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;   
+      background: #444;
+      width: 95%;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Modal de boas-vindas -->
+  <div class="modal" id="popupModal" style="display: flex;">
+    <div class="modal-content">
+      <h2>Bem-vindo ao IPTV-Newtech</h2>
+      <p>1° Acesse o Site e Aguarde o download</p>
+      <p>2° http</p>
+      <p>3° Clique para procurar o arquivo</p>
+      <p>4° Arquivo por nome playlist</p>
+      <p>5° Clique em play após carregar o arquivo</p>
+      <button onclick="fecharModal()">Fechar</button>
+    </div>
+  </div>
+
+  <!-- Modal de contagem -->
+  <div class="modal" id="contagemModal">
+    <div class="modal-content">
+      <h2>Processando a Playlist</h2>
+      <p>Aguarde <span id="contador">180</span> segundos...</p>
+    </div>
+  </div>
+
+  <h1>Iptv-Newtech</h1>
+
+  <video id="iptvPlayer" class="iptv" controls autoplay>
+    <source src="" type="application/x-mpegURL">
+    Seu navegador não suporta vídeo.
+  </video>
+
+  <div class="controls">
+    <input class="ocultarFile" type="file" id="m3uFile" accept=".m3u, .m3u8">
+    <label for="m3uFile">Adicionar Arquivo</label>
+    <input class="buscar" type="text" id="buscaInput" placeholder="Buscar canal..." oninput="filtrarCanais()">
+  </div>
+
+  <div class="controlls">
+    <button onclick="filtrarCategoria('canal')">Canais</button>
+    <button onclick="filtrarCategoria('filme')">Filmes</button>
+    <button onclick="filtrarCategoria('série')">Séries</button>
+    <button onclick="mostrarTodos()">Todos</button>
+  </div>
+
+  <div class="canal-lista" id="listaCanais"></div>
+
+  <!-- HLS.js (para suporte a M3U8) -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+  <script>
+    const video = document.getElementById('iptvPlayer');
+    const m3uInput = document.getElementById('m3uFile');
+    const listaCanais = document.getElementById('listaCanais');
+    const buscaInput = document.getElementById('buscaInput');
+    const modal = document.getElementById('popupModal');
+    const contagemModal = document.getElementById('contagemModal');
+    const contador = document.getElementById('contador');
+
+    let canais = [];
+    let canaisFiltrados = [];
+    let bloqueado = true;
+
+    function fecharModal() {
+      modal.style.display = 'none';
+    }
+
+    m3uInput.addEventListener('change', function () {
+      const file = m3uInput.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const conteudo = e.target.result;
+        canais = parseM3U(conteudo);
+        canaisFiltrados = [...canais];
+        renderizarCanais();
+        iniciarContagemRegressiva(); // iniciar contador após carregar
+      };
+      reader.readAsText(file);
+    });
+
+    function parseM3U(texto) {
+      const linhas = texto.split('\n');
+      let lista = [];
+
+      for (let i = 0; i < linhas.length; i++) {
+        if (linhas[i].startsWith('#EXTINF')) {
+          const match = linhas[i].match(/group-title="([^"]+)".*,(.*)/) || linhas[i].match(/#EXTINF.*,(.*)/);
+          const grupo = match && match[1] ? match[1] : 'Sem grupo';
+          const titulo = match && match[2] ? match[2] : match[1] || 'Sem título';
+          const url = linhas[i + 1]?.trim();
+          if (url && url.startsWith('http')) {
+            lista.push({ titulo: `${titulo} [${grupo}]`, url });
+          }
+        }
+      }
+
+      console.log("Canais carregados:", lista); // Log para verificar os canais carregados
+      return lista;
+    }
+
+    function renderizarCanais() {
+      listaCanais.innerHTML = '';
+      canaisFiltrados.forEach(canal => {
+        const btn = document.createElement('button');
+        btn.textContent = canal.titulo;
+        btn.onclick = () => {
+          if (!bloqueado) {
+            // Usando HLS.js para .m3u8
+            if (Hls.isSupported()) {
+              const hls = new Hls();
+              hls.loadSource(canal.url);
+              hls.attachMedia(video);
+            } else {
+              video.src = canal.url;
+            }
+            video.play();
+          } else {
+            alert("Aguarde o tempo de liberação!");
+          }
+        };
+        listaCanais.appendChild(btn);
+      });
+    }
+
+    function filtrarCategoria(palavra) {
+      canaisFiltrados = canais.filter(c => c.titulo.toLowerCase().includes(palavra));
+      renderizarCanais();
+    }
+
+    function mostrarTodos() {
+      canaisFiltrados = [...canais];
+      buscaInput.value = '';
+      renderizarCanais();
+    }
+
+    function filtrarCanais() {
+      const busca = buscaInput.value.toLowerCase();
+      canaisFiltrados = canais.filter(c => c.titulo.toLowerCase().includes(busca));
+      renderizarCanais();
+    }
+
+    function iniciarContagemRegressiva() {
+      bloqueado = true;
+      let tempo = 60;
+      contador.textContent = tempo;
+      contagemModal.style.display = 'flex';
+
+      const interval = setInterval(() => {
+        tempo--;
+        contador.textContent = tempo;
+        if (tempo <= 0) {
+          clearInterval(interval);
+          contagemModal.style.display = 'none';
+          bloqueado = false;
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
